@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+  uwsgi:
+    build:
+      context: .
+      #args:
+      #  project_directory: "/sample/"
+      dockerfile: ./uwsgi/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - "./src:/var/www/src"
+      - "./uwsgi/uwsgi.ini:/var/www/sample/uwsgi.ini"
+    environment:
+      TZ: "Asia/Tokyo"
+      FLASK_ENV: "development"
+    #command: "flask run --host 0.0.0.0 --port 5000"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/default.conf
+    depends_on:
+      - uwsgi
+    ports:
+      - "10080:80"
+    environment:
+      TZ: "Asia/Tokyo"
